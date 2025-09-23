@@ -1,0 +1,16 @@
+Relatório de Interação com LLM para produção da Primeira Entrega do Projeto
+
+LLM Utilizada: ChatGPT (versão gratuita)
+
+Comentário 1: 
+    Para começar o trabalho, foi indicado as especificações do projeto e como queria
+    esta primera parte, a equivalente a primeira entrega;
+
+Pedido 1:
+Olá, boa tarde. Gostaria de pedir ajuda para criar uma estrutura inicial de um projeto
+na linguagem C para Concorrência. Essas são as especificações:
+
+(Aqui foi inserido o Tema, os Requisitos do 1 ao 8 e os pontos da Etapa 1)
+
+Diante disso, eu queria saber como construir a estrutura do arquivo c para etapa 1,
+pelo menos com as bibliotecas, main e alguns testes
