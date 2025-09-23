@@ -2,11 +2,11 @@ Relatório de Interação com LLM para produção da Primeira Entrega do Projeto
 
 LLM Utilizada: ChatGPT (versão gratuita)
 
-Comentário 1: 
-    Para começar o trabalho, foi indicado as especificações do projeto e como queria
-    esta primera parte, a equivalente a primeira entrega;
+    Comentário 1: 
+Para começar o trabalho, foi indicado as especificações do projeto e como queria
+esta primera parte, a equivalente a primeira entrega;
 
-Pedido 1:
+    Pedido 1:
 Olá, boa tarde. Gostaria de pedir ajuda para criar uma estrutura inicial de um projeto
 na linguagem C para Concorrência. Essas são as especificações:
 
@@ -15,7 +15,7 @@ na linguagem C para Concorrência. Essas são as especificações:
 Diante disso, eu queria saber como construir a estrutura do arquivo c para etapa 1,
 pelo menos com as bibliotecas, main e alguns testes
 
-Resposta 1:
+    Resposta 1:
 "Perfeito — para a Etapa 1, o foco é apenas a biblioteca de logging concorrente (libtslog),
 com API clara e um CLI de teste que simula múltiplas threads gravando logs.
 Vou te sugerir uma estrutura inicial de projeto em C que já organiza headers,
@@ -35,4 +35,4 @@ Após isso, a IA inseriu os arquivos mencionados na estrutura.
     Permite rodar múltiplas threads simulando clientes de log.
     Gera saída em arquivo logs.txt ou stdou"
 
-Comentário 1.1:
+    Comentário 1.1:
