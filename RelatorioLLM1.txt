@@ -14,3 +14,25 @@ na linguagem C para Concorrência. Essas são as especificações:
 
 Diante disso, eu queria saber como construir a estrutura do arquivo c para etapa 1,
 pelo menos com as bibliotecas, main e alguns testes
+
+Resposta 1:
+"Perfeito — para a Etapa 1, o foco é apenas a biblioteca de logging concorrente (libtslog),
+com API clara e um CLI de teste que simula múltiplas threads gravando logs.
+Vou te sugerir uma estrutura inicial de projeto em C que já organiza headers,
+implementação e um main.c de teste com pthread. Assim você pode evoluir depois
+para o servidor TCP."
+include/
+── tslog.h
+src/
+── tslog.c
+── main.c
+Makefile
+
+Após isso, a IA inseriu os arquivos mencionados na estrutura.
+
+"Esse setup já:
+    Cria a biblioteca tslog thread-safe com pthread_mutex.
+    Permite rodar múltiplas threads simulando clientes de log.
+    Gera saída em arquivo logs.txt ou stdou"
+
+Comentário 1.1:
