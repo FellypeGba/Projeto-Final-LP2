@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <errno.h>
 
 #define NUM_THREADS 5
 
@@ -16,7 +17,27 @@ void *thread_func(void *arg) {
 }
 
 int main(void) {
-    if (tslog_init("logs.txt") != 0) {
+    char input[32];
+    int overwrite = 0; // padrão: append
+
+    printf("Digite 1 para sobrescrever o arquivo de log ou qualquer outra tecla para continuar: ");
+    
+    if (fgets(input, sizeof(input), stdin) != NULL) {
+        char *endptr;
+        errno = 0;
+        long val = strtol(input, &endptr, 10);
+
+        if (errno == 0 && endptr != input && *endptr == '\n') {
+            // Conversão bem-sucedida e só número digitado
+            overwrite = (val == 1) ? 1 : 0;
+        } else {
+            printf("Entrada inválida detectada. Mantendo modo padrão (append).\n");
+        }
+    } else {
+        printf("Erro ao ler entrada. Mantendo modo padrão (append).\n");
+    }
+
+    if (tslog_init("logs.txt", overwrite) != 0) {
         fprintf(stderr, "Falha ao inicializar logger.\n");
         return EXIT_FAILURE;
     }

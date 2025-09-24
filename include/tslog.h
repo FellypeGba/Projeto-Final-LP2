@@ -16,10 +16,11 @@ typedef enum {
 
 /**
  * Inicializa o logger.
- * @param filename: arquivo de saída (pode ser stdout/stderr se NULL).
+ * @param filename: arquivo de saída.
+ * @param overwrite: 0 ou 1, define se o arquivo será sobrescrito ou não.
  * @return 0 se sucesso, -1 se erro.
  */
-int tslog_init(const char *filename);
+int tslog_init(const char *filename, int overwrite);
 
 /**
  * Fecha o logger e libera recursos.

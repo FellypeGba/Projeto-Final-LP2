@@ -36,3 +36,53 @@ Após isso, a IA inseriu os arquivos mencionados na estrutura.
     Gera saída em arquivo logs.txt ou stdou"
 
     Comentário 1.1:
+Após essa parte incial, foi realizado os primeiros testes e pareceu tudo funcionar
+bem, com as threads escrevendo no log, mas protegidas por um mutex.
+Então apenas foi pergutando dúvidas sobre o código e inserido comentários no mesmo.
+
+    Pedido 2:
+Deu tudo certo amigo, só uma dúvidas. Essa escrita no arquivo log.txt pode ser
+de caráter sobrescrita ou só acumulativa?
+
+    Resposta 2:
+"Boa pergunta
+Do jeito que eu deixei no código (fopen(filename, "a")), o arquivo de log é
+aberto em modo append → ou seja:
+    Não sobrescreve o conteúdo anterior.
+    Sempre acrescenta novas linhas no final do logs.txt.
+Isso é comum em sistemas de logging, porque você não quer perder histórico."
+(Após isso, eu perguntei como fazer o usuário selecionar a opção.
+Então a versão dos logs, com opção de escrita pelo usuário)
+
+    Comentário 2:
+Após mais uns testes, foi possível executar mais alguns testes e foi percebido
+que o código realmente já estava seguindo os requisitos da primeira entrega.
+Então, só foi necessário pedir para ter um melhor tratamento de erro.
+
+    Pedido 3:
+Além disso, é possível ter um tratamento de erro, caso haja um erro de digitação
+nessa entrada para escolher o modo de escrita dos logs?
+
+    Resposta 3:
+"Boa sacada — sim, dá pra tratar esse caso.
+O problema é que scanf("%d", &escolha) espera um número inteiro. Se o usuário
+digitar letras ou símbolos, o scanf falha e deixa o buffer “sujo”.
+O que a gente pode fazer:
+    Ler a entrada como string (fgets),
+    Tentar converter para número com strtol,
+    Se a conversão falhar → assumir um valor padrão (append) e mostrar aviso."
+(Aqui foi inserido o novo código do main.c com as novas alterações)
+"O que mudou:
+    Uso de fgets → lê a linha inteira como string.
+    Uso de strtol → tenta converter para inteiro.
+    Se falhar, mostra aviso e segue com append como padrão.
+Exemplos de comportamento:
+    Digitar 1 → sobrescreve.
+    Digitar 2, 0, 999 etc → mantém append.
+    Digitar abc ou 1abc → mensagem: Entrada inválida detectada. Mantendo modo padrão (append).
+Só apertar Enter → também assume append."
+
+    Comentário 3:
+Por fim, com últimos testes, o código conseguiu seguir os requisitos e funcionar
+conforme o esperado, com as threads escrevendo no log com auxilio de um mutex
+E ate podendo escolher se o log será sobrescrito ou não.
