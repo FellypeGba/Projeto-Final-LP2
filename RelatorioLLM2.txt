@@ -1,0 +1,180 @@
+Relatório de Interação com LLM para produção da Segunda Entrega do Projeto
+
+LLM Utilizada: Copilot Pro para Estudantes (integrado ao VSCode)
+
+    Comentário 1:
+Em primeiro lugar, eu peguei todos os arquivos do contexto da entrega 1 e
+inseri no contexto da consulta ao Copilot, também colocando os requisitos
+dados no documento de especificações do projeto. Assim, apenas inseri a 
+parte que fala sobre a entrega dois e perguntei o que poderia ser feito
+para implementar essa parte.
+
+    Pedido 1:
+(contexo e código da entrega 1)
+"Como pode ver nos arquivos inseridos, essa entrega1 já foi finalizada,
+agora eu gostaria de saber como desenvolver a parte da entrega2,
+especificada aqui:" (inserido os requisitos da entrega2).
+
+    Resposta 1:
+"Para a entrega2, você deve evoluir sua arquitetura para incluir comunicação
+em rede (TCP), criando um servidor que aceita múltiplos clientes e um cliente 
+CLI que conecta e envia mensagens. O servidor deve usar threads para cada 
+cliente e retransmitir mensagens (broadcast). O logging deve continuar usando a 
+tslog_write da sua libtslog."
+
+    Comentário 1.1:
+Com isso, eu pedi os códigos do cliente e do servidor, pelo menos para a parte
+inicial da estrutura, e o Copilot me recomendou essa estrutura:
+include/
+    tslog.h
+    server.h
+    client.h
+src/
+    tslog.c
+    main.c
+    server.c
+    client.c
+makefile
+
+Por fim, eu pedi uma nova versão do makefile só para realizar testes,
+que foram executados corretamente, gerando uma atividade simples no
+log do servidor:
+"[15:37:35] [INFO] Servidor iniciado na porta 9000
+[15:37:51] [INFO] Novo cliente conectado: 5
+[15:38:05] [INFO] Novo cliente conectado: 6"
+
+    Pedido 2:
+"Então, agora os clientes aparecem e geram mensagens no log do servidor.
+Entretanto, o log do cliente permanece vazio. Como fazer para que cada
+cliente "chegue" no log do servidor e com isso uma mensagem fosse gerada
+no client_log.txt"
+
+    Resposta 2:
+"Para que o log do cliente registre quando ele "chega" (conecta ao servidor),
+basta adicionar um registro de log logo após a conexão ser estabelecida no
+cliente. Assim, cada vez que o cliente conectar, será gerada uma mensagem
+no client_log.txt."
+(aqui foi indicado a linha para gerar uma escrita no log de cliente)"
+
+    Pedido 3:
+"Outra coisa, o arquivo do servidor está sendo escrito sem sobrescrita,
+neste caso, será possível escrever uma pequena mensage indicando que o
+servidor foi encerrado? Fica melhor de organizar, se não for possível,
+então ficaria melhor ele sobrescrever o arquivo do servidor antes de
+começar a escrever nele"
+
+    Resposta 3:
+"Sim, é possível registrar uma mensagem indicando que o servidor foi
+encerrado antes de fechar o logger. Basta adicionar um log no final
+do main do servidor, antes de chamar tslog_close():
+    tslog_init("server_log.txt", 1);
+Se preferir sobrescrever o arquivo de log a cada execução, basta
+alterar o parâmetro do tslog_init para 1."
+
+    Comentário 3:
+Diante dessa nova versão, o código já era capaz de usar vários 
+clientes e eles escreverem no mesmo log, porém, eu estava meio incerto
+sobre a capacidade de gerenciamento do sincronismo.
+
+    Pedido 4:
+"Entretanto amigo, você pode me dizer como funciona a estrutura de controle
+de acessoa a seção crítica nesse sistema? No caso, como os clientes são
+organizados para mandar mensagens no log e o servidor receber e escreve 
+no arquivo. Se já tiver essa estrutura, pode só fazer comentários indicando 
+o papel teórico das funções de sincronismo.
+
+    Resposta 4:
+(primeiro o Copilot fez um pequeno resumo sobre controle de acessos durante
+o código, onde depois colocou alguns comentários no código e me apresentou
+um resumo)
+"Resumo Teórico
+Mutexes garantem que apenas uma thread por vez acesse/modifique recursos compartilhados
+(lista de clientes, arquivo de log).
+Seções críticas são regiões do código onde recursos compartilhados são acessados/modificados.
+No seu sistema:
+    Lista de clientes (servidor): protegida por clients_mutex
+    Arquivo de log (servidor e cliente): protegido por log_mutex da libtslog
+    Se quiser, posso adicionar comentários explicativos diretamente no código!
+
+    Comentário 4:
+Dessa forma, eu quis desenvolver melhor o código para testes através de mensagens
+que os clientes possam passar para o servidor. E com elas, o servidor pode registrar
+mensagens e gerenciar o que é escrito no log do servidor e o que vai por broadcast
+
+    Pedido 5:
+"Pode modificar o arquivo de cliente para que ao rodar ele, o usuário possa mandar
+uma mensagem que o servidor receba (e escreva esta mensagem apenas no log dele), mas
+informe que o cliente 5 (por exemplo) mandou mensagem (sendo esta última informação
+transmitida por broadcast para todos os logs de cliente)."
+
+    Resposta 5:
+"Claro! Para isso, o servidor precisa distinguir entre dois tipos de mensagens:
+    Mensagem comum: O servidor recebe e apenas registra no seu log.
+    Mensagem de broadcast: O servidor informa a todos os clientes (exceto o remetente)
+    que 'Cliente X mandou mensagem'.
+No cliente, ao enviar uma mensagem, ela será enviada normalmente. O servidor, ao receber, faz:
+    Loga o conteúdo da mensagem no seu próprio log.
+    Envia para todos os clientes (broadcast) uma mensagem do tipo:
+    'Cliente <fd> enviou: <mensagem>'.
+
+No servidor, altere a função de broadcast para enviar a mensagem formatada para
+todos os clientes (exceto o remetente)
+
+Resumo:
+    O servidor loga apenas o conteúdo da mensagem recebida.
+    O servidor faz broadcast para os outros clientes informando quem enviou e o conteúdo.
+    O cliente exibe e loga toda mensagem recebida do servidor como broadcast.
+    Se quiser que o servidor também logue o broadcast,
+    basta adicionar um tslog_write dentro de broadcast_info."
+
+    Comentario 5:
+Entretanto, apesar do sistema de sistemas está funcionando bem, existe um problema com
+uma estratégia prática, porque como a ideia é que cada cliente tenha seu próprio arquivo
+"client_log.txt", ele não tem controle de acesso. Então, quando eu testo com múltiplos
+terminais dentro da mesma máquina, o arquivo estava sendo corrompido."
+
+    Pedido 6:
+"Só um problema, creio que está tendo uma corrupção do arquivo client_log.txt quanndo
+eu testo abrindo múltiplos terminais aqui. Como posso fazer um controle de acesso para
+o arquivo de cliente? Porque o de servidor sem problema."
+
+    Resposta 6:
+"Ótima observação! O problema ocorre porque vários clientes estão escrevendo no mesmo
+arquivo client_log.txt. Cada instância do cliente deveria criar e escrever em seu próprio
+arquivo de log, para evitar corrupção por concorrência entre processos diferentes.
+Como corrigir?
+Solução recomendada:
+Cada cliente deve criar um arquivo de log exclusivo, por exemplo, usando o número do socket,
+PID ou um identificador único."
+(e ofereceu o código de modificação para isso)
+
+    Comentário 6:
+Na verdade, esta abordagem de criar múltiplos é até mais interessante, porque dessa forma,
+mesmo que os clientes estejam rodando na mesma máquina, cada um terá seu log, simulando
+melhor a arquitetura do projeto de clientes e servidor.
+
+    Pedido 7:
+"Tudo funcionando corretamente, apenas uma coisa, como criar um arquivo para realizar scripts
+de teste, criando múltiplos clientes (como cada um cria o próprio log, pode colocar até numa
+pasta separada, para ficar todos os logs de cliente)"
+
+    Resposta 7:
+"Você pode criar um script Bash para iniciar múltiplos clientes em paralelo, cada um gerando
+seu próprio log. Para organizar, crie uma pasta chamada client_logs e mova os logs para lá
+após cada execução.
+Observações:
+Os clientes vão rodar em background e criar seus próprios logs.
+Os logs serão movidos para a pasta client_logs ao final."
+
+    Comentário 7 (Conclusão):
+Após algumas alterações no arquivo .sh para garantir que os clientes possam escrever no log,
+a entrega do projeto foi concluida. Onde existem duas entidades: o servidor, que recebe os
+clientes através de mensagens via sockets. Além disso, cada entidade cliente vem com um texto,
+e esse texto é passado para o servidor. Quando ele envia, o servidor informa no log do outros
+clientes a mensagem do cliente (com exceção do caso onde o próprio cliente é emissor da
+mensagem).
+Porém, dentro do log do servidor, todos as comunicações são feitas de forma mais clara,
+indicando quando um cliente se conecta ou se desconecta do servidor.
+Todo o acesso ao log do servidor é controlado por elementos de sincronismo, pois é um recurso
+compartilhado.
+

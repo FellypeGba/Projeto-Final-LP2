@@ -1,0 +1,21 @@
+[17:16:06] [INFO] Servidor iniciado na porta 9000
+[17:16:16] [INFO] Novo cliente conectado: 5
+[17:16:16] [INFO] Mensagem recebida do cliente 5: Passando aqui no servidor para dar um oi
+[17:16:16] [INFO] Mensagem enviada ao servidor pelo cliente 5
+[17:16:17] [INFO] Novo cliente conectado: 6
+[17:16:17] [INFO] Mensagem recebida do cliente 6: Passando aqui no servidor para dar um oi
+[17:16:17] [INFO] Mensagem enviada ao servidor pelo cliente 6
+[17:16:17] [INFO] Novo cliente conectado: 7
+[17:16:17] [INFO] Mensagem recebida do cliente 7: Passando aqui no servidor para dar um oi
+[17:16:17] [INFO] Mensagem enviada ao servidor pelo cliente 7
+[17:16:17] [INFO] Novo cliente conectado: 8
+[17:16:17] [INFO] Mensagem recebida do cliente 8: Passando aqui no servidor para dar um oi
+[17:16:17] [INFO] Mensagem enviada ao servidor pelo cliente 8
+[17:16:17] [INFO] Novo cliente conectado: 9
+[17:16:17] [INFO] Mensagem recebida do cliente 9: Passando aqui no servidor para dar um oi
+[17:16:17] [INFO] Mensagem enviada ao servidor pelo cliente 9
+[17:16:17] [INFO] Cliente 5 desconectado.
+[17:16:18] [INFO] Cliente 6 desconectado.
+[17:16:18] [INFO] Cliente 7 desconectado.
+[17:16:18] [INFO] Cliente 8 desconectado.
+[17:16:18] [INFO] Cliente 9 desconectado.

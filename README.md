@@ -20,14 +20,30 @@ Abra o terminal na pasta raiz do projeto e execute este comando:
 make
 ```
 Esse passo criará o executável do main.
-### Executando o arquivo
-Após criar o arquivo, basta executar este comando:
 
+### Executando o arquivo
+
+#### Fazendo um Teste Manual
+Com o Make feito, você pode rodar o servidor através desse comando:
+``` bash
+./server
+```
+Com ele em execução, basta abrir um outro terminal ou fazer uma conexão a partir das informações do servidor.  
+Então, é só executar o código do cliente neste outro terminal:
 ``` bash
 ./main
 ```
-### Instruções:
-Com o código rodando, basta digitar a sua escolha no terminal.
-Apertar 1 sobrescreverá os logs já existentes.
-Já selecionar outra tecla escreverá os logs na próxima linha.
-Depois de selecionado, o código escreverá os resultados no arquivo **"logs.txt"**
+O log do servidor estará sendo escrito em **"server_log.txt"**  
+Enquanto isso, os logs do clientes sempre são criados um para cada client rodado, no formato: **"client_log(PID).txt"**
+### Teste Simulando Múltiplos clientes
+Para simular múltiplos clientes de forma prática, execute o servidor como dito anteriormente.  
+Porém, para a parte de clientes, basta executar estes comandos em um novo terminal:  
+Dando permissão de execução:
+``` bash
+chmod +x test_clients.sh
+```
+Executanto o script:
+``` bash
+./test_clients.sh
+```
+Nesta abordagem, os logs dos clientes entrarão na pasta **client_logs**
