@@ -60,7 +60,6 @@ int main() {
         tslog_write(LOG_INFO, "Mensagem enviada ao servidor pelo cliente %d", sock);
 
         sleep(1); // Aguarda 1 segundo para receber broadcast e garantir escrita no log
-        break;    // Encerra após enviar uma mensagem
     }
 
     close(sock);

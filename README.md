@@ -31,7 +31,7 @@ Com o Make feito, você pode rodar o servidor através desse comando:
 Com ele em execução, basta abrir um outro terminal ou fazer uma conexão a partir das informações do servidor.  
 Então, é só executar o código do cliente neste outro terminal:
 ``` bash
-./main
+./client
 ```
 O log do servidor estará sendo escrito em **"server_log.txt"**  
 Enquanto isso, os logs do clientes sempre são criados um para cada client rodado, no formato: **"client_log(PID).txt"**
