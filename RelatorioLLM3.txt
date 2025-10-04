@@ -36,10 +36,10 @@ send()).
     Resposta 2:
 Aqui basicamente ele saiu indicando os passos que estava fazendo,
 começando com a criação dos módulos de threadsafe_queue, ou seja, uma 
-fila segura de threads que correspondem a clientes. Além da estrutura
-chat_server, para controlar o acesso ao log. Essa nova abordagem foi
-implementada usando monitores, por serem uma forma de sincronização de
-mais alto nível.
+fila segura de recebimento e envio das mensagens . Além da estrutura
+chat_server, para controlar o acesso aos clientes, ao log e se comunica
+com o servidor em si. Essa nova abordagem foi implementada usando
+monitores, por serem uma forma de sincronização de mais alto nível.
 
     Comentário 2:
 Com o aumento de estruturas de alto nível, o código ficou mais "seguro",
@@ -50,7 +50,7 @@ continuar para os próximos passos
 
     Pedido 3:
 "Na verdade, diante de todo esse contexto, gostaria de ter um momento de
-"checkpoint", onde em vez de seguir os próximos passos de implementação,
+'checkpoint', onde em vez de seguir os próximos passos de implementação,
 fosse analisado bem o que se tem agora e comentado as linhas mais
 importantes para indicar de fora geral o objetivo das funções"
 
@@ -69,3 +69,45 @@ ver observação sobre sinal handler e checagens de retorno.
 em alguns inits.
     Logging: tslog usado em eventos importantes — presente.
     Build: make pronto — testado e compilou.
+
+    Comentário 3:
+Diante disso, eu pedi para que o Copilot colocasse alguns comentários, e
+assim eu fui entendendo melhor o funcionamento das novas estruturas, então
+para o próximo passo, pedi mais para verificar os erros e fazer checagens
+para tornar o código mais robusto.
+
+    Pedido 4:
+"Agora, com essas novas mudanças, você pode analisar estruturas no código
+que deviam ter checagem de erros e analisar mais o lado sintático e um pouco
+semântico do código, antes de prosseguir com os próximos passos."
+
+    Reposta 4:
+"Vou aplicar mudanças em lote para deixar o código mais robusto: checagens de
+retorno em inicializações (mutex/sem/queue), checar strdup em mq_push, tratar
+erro de inet_pton no cliente e remover a chamada insegura de logger no signal
+handler. O resultado esperado: funções retornam erros de inicialização e fazem
+cleanup apropriado; menos risco de falhas silenciosas."
+
+    Comentário 4:
+Com as novas mundanças, o código ficou mais seguro, já que eram feito mais
+checagens de erros, ou de alocação de memória para uma variavél ou por alguma
+tentiva de conexão. Assim, o próximo passo era implementar uma função chamada
+send_all() para conseguir, de forma mais segura, enviar o broadcast para todos
+os clientes
+
+    Pedido 5:
+"Agora, pode criar a função send_all conforme foi indicada e garantir mais
+robustez no broadcast das mensagens, se puder, pode adiocionar outras funções
+que faltam, mas que foram observadas como importantes dado os requisitos."
+
+    Resposta 5:
+"Implementei as melhorias pedidas e testei a compilação. Resumo do que
+adicionei e integrei:
+    Novo utilitário de rede:
+        net.h e net.c com send_all(int fd, const void *buf, size_t len) que
+lida com writes parciais e EINTR.
+    Envios robustos:
+        broadcaster agora usa send_all para enviar mensagens a cada cliente e
+conta quantos alvos foram atingidos; loga: "Broadcast enviado (remetente=X,
+alvos=Y)".
+        client.c usa send_all para enviar mensagens do cliente"

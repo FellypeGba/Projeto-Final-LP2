@@ -9,6 +9,7 @@
 #include <signal.h>
 #include <errno.h>
 #include "chat_server.h"
+#include "net.h"
 
 #define PORT 9000
 #define MAX_CLIENTS 10
@@ -33,8 +34,7 @@ static void sigint_handler(int signo) {
      * accept() seja desbloqueado; o encerramento completo é feito na
      * thread principal.
      */
-    tslog_write(LOG_INFO, "SIGINT recebido: encerrando servidor");
-    /* chat_server_shutdown is called later from main after accept returns */
+    /* sinal recebido; main() irá lidar com o encerramento e registrar o log */
 }
 
 // Função para lidar com comunicação de um cliente (em cada thread)
@@ -53,11 +53,11 @@ void *client_thread(void *arg) {
     while ((len = recv(sock, buffer, sizeof(buffer)-1, 0)) > 0) {
         buffer[len] = '\0';
         tslog_write(LOG_INFO, "Mensagem recebida do cliente %d: %s", sock, buffer);
-        /* enqueue message to be broadcasted by broadcaster thread */
+        /* mensagem a ser colocada na fila pra broadcast */
         chat_server_enqueue_message(&chat, buffer, sock);
     }
 
-    /* remove client and cleanup */
+    /* remove client e faz a limpeza */
     chat_server_remove_client(&chat, sock);
     close(sock);
     tslog_write(LOG_INFO, "Cliente %d desconectado.", sock);
@@ -152,8 +152,8 @@ int main() {
         pthread_detach(tid);
         tslog_write(LOG_INFO, "Novo cliente conectado: %d", client_fd);
     }
-
-    tslog_write(LOG_INFO, "Servidor encerrado.");
+    /* main thread detected server_running == 0 or accept was interrupted */
+    tslog_write(LOG_INFO, "Servidor encerrando: sinal recebido ou loop de accept finalizado.");
     chat_server_shutdown(&chat);
     tslog_close();
     if (server_fd >= 0) close(server_fd);

@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <errno.h>
+#include "net.h"
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 9000
@@ -20,8 +21,7 @@ void *receive_thread(void *arg) {
     /*
      * Thread de recepção: imprime qualquer mensagem enviada pelo servidor.
      * Usa um buffer de tamanho fixo (256 bytes); mensagens maiores serão
-     * truncadas. Para produção, considere um protocolo com prefixo de
-     * comprimento ou crescimento dinâmico do buffer.
+     * truncadas.
      */
     while ((len = recv(sock, buffer, sizeof(buffer)-1, 0)) > 0) {
         buffer[len] = '\0';
@@ -46,6 +46,12 @@ int main() {
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(SERVER_PORT);
     inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr);
+    if (inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr) != 1) {
+        fprintf(stderr, "Endereco IP invalido: %s\n", SERVER_IP);
+        close(sock);
+        tslog_close();
+        return 1;
+    }
 
     if (connect(sock, (struct sockaddr*)&server_addr, sizeof(server_addr)) != 0) {
         perror("Falha ao conectar");
@@ -64,7 +70,7 @@ int main() {
     }
     *psock = sock;
     if (pthread_create(&tid, NULL, receive_thread, psock) != 0) {
-        tslog_write(LOG_ERROR, "Falha ao criar thread de recepção");
+        fprintf(stderr, "Falha ao criar thread de recepcao\n");
         free(psock);
         close(sock);
         tslog_close();
@@ -83,13 +89,12 @@ int main() {
             break;
         }
     /*
-     * Envio: usamos uma única chamada send(). Em casos raros send()
+     * Envio: usa-se uma única chamada send(). Em casos raros send()
      * pode escrever parcialmente; uma implementação robusta deveria
      * iterar até enviar tudo ou ocorrer um erro (ver sugestão
      * send_all nas notas do checkpoint).
      */
-        ssize_t s = send(sock, msg, strlen(msg), 0);
-        if (s < 0) {
+        if (send_all(sock, msg, strlen(msg)) < 0) {
             perror("send");
             tslog_write(LOG_ERROR, "Falha no send do cliente %d: %s", sock, strerror(errno));
             break;

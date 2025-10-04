@@ -30,5 +30,6 @@ int chat_server_add_client(ChatServer *s, int client_fd);
 void chat_server_remove_client(ChatServer *s, int client_fd);
 int chat_server_enqueue_message(ChatServer *s, const char *msg, int sender_fd);
 void chat_server_shutdown(ChatServer *s);
+int chat_server_send_history(ChatServer *s, int client_fd, int n);
 
 #endif // CHAT_SERVER_H
