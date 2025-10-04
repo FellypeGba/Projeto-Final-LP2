@@ -52,7 +52,20 @@ void *client_thread(void *arg) {
      */
     while ((len = recv(sock, buffer, sizeof(buffer)-1, 0)) > 0) {
         buffer[len] = '\0';
-        tslog_write(LOG_INFO, "Mensagem recebida do cliente %d: %s", sock, buffer);
+        /* Se for uma mensagem de nome (prefixo NAME:), registre o nome e não broadcast */
+        if (strncmp(buffer, "NAME:", 5) == 0) {
+            const char *name = buffer + 5;
+            chat_server_set_name(&chat, sock, name);
+            tslog_write(LOG_INFO, "Cliente identificado: %s (fd=%d)", name, sock);
+            continue;
+        }
+        /* log com nome quando disponível */
+        const char *cname = chat_server_get_name(&chat, sock);
+        if (cname) {
+            tslog_write(LOG_INFO, "Mensagem recebida de %s (cliente %d): %s", cname, sock, buffer);
+        } else {
+            tslog_write(LOG_INFO, "Mensagem recebida do cliente %d: %s", sock, buffer);
+        }
         /* mensagem a ser colocada na fila pra broadcast */
         chat_server_enqueue_message(&chat, buffer, sock);
     }
@@ -108,6 +121,9 @@ int main() {
      * 4. quando sinalizado, sair do loop e executar chat_server_shutdown
      */
     tslog_write(LOG_INFO, "Servidor iniciado na porta %d", PORT);
+    /* Mensagem no terminal para o usuário indicando como encerrar o servidor */
+    printf("Servidor Iniciado, use CTRL+C para sair\n");
+    fflush(stdout);
 
     if (chat_server_init(&chat, MAX_CLIENTS, 100) != 0) {
         tslog_write(LOG_ERROR, "Falha ao iniciar ChatServer");
@@ -154,6 +170,9 @@ int main() {
     }
     /* main thread detected server_running == 0 or accept was interrupted */
     tslog_write(LOG_INFO, "Servidor encerrando: sinal recebido ou loop de accept finalizado.");
+    /* Mensagem de encerramento no terminal */
+    printf("Servidor encerrando...\n");
+    fflush(stdout);
     chat_server_shutdown(&chat);
     tslog_close();
     if (server_fd >= 0) close(server_fd);

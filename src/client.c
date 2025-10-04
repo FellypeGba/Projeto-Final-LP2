@@ -31,7 +31,7 @@ void *receive_thread(void *arg) {
     return NULL;
 }
 
-int main() {
+int main(int argc, char **argv) {
     char logname[64];
     snprintf(logname, sizeof(logname), "client_log_%d.txt", getpid());
     tslog_init(logname, 0);
@@ -57,6 +57,19 @@ int main() {
         perror("Falha ao conectar");
         tslog_close();
         return 1;
+    }
+
+    /* Se o usuário passou um nome como argumento, envie como primeira mensagem usando o prefixo NAME: */
+    if (argc >= 2) {
+        const char *name = argv[1];
+        char name_msg[256];
+        snprintf(name_msg, sizeof(name_msg), "NAME:%s", name);
+        if (send_all(sock, name_msg, strlen(name_msg)) < 0) {
+            perror("send (name)");
+            tslog_write(LOG_WARN, "Falha ao enviar nome do cliente");
+        } else {
+            tslog_write(LOG_INFO, "Nome do cliente enviado: %s", name);
+        }
     }
 
     pthread_t tid;

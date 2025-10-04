@@ -15,4 +15,4 @@ client: src/client.c src/tslog.c src/net.c
 	$(CC) $(CFLAGS) src/client.c src/tslog.c src/net.c -o client
 
 clean:
-	rm -f server client main *.o *.txt
+	rm -f server client main *.o

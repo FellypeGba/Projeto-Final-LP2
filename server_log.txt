@@ -1,11 +1,14 @@
-[23:56:16] [INFO] Servidor iniciado na porta 9000
-[23:56:23] [INFO] Novo cliente conectado: 5
-[23:56:29] [INFO] Mensagem recebida do cliente 5: Oi, eu sou Fellype
-[23:56:29] [INFO] Mensagem enviada ao servidor pelo cliente 5
-[23:56:40] [INFO] Mensagem recebida do cliente 5: E ai, como vao vcs?
-[23:56:40] [INFO] Mensagem enviada ao servidor pelo cliente 5
-[23:57:04] [INFO] Novo cliente conectado: 6
-[23:57:13] [INFO] Mensagem recebida do cliente 6: Oi, sou Tereza Cristina
-[23:57:13] [INFO] Mensagem enviada ao servidor pelo cliente 6
-[00:01:24] [INFO] Cliente 6 desconectado.
-[00:01:25] [INFO] Cliente 5 desconectado.
+[15:49:50] [INFO] Servidor iniciado na porta 9000
+[15:49:57] [INFO] Cliente adicionado (fd=5), total=1
+[15:49:57] [INFO] Novo cliente conectado: 5
+[15:50:06] [INFO] Mensagem recebida do cliente 5: Oi, sou o homem sem nome
+[15:50:06] [INFO] Broadcast enviado (remetente=5, alvos=0)
+[15:50:13] [INFO] Cliente adicionado (fd=6), total=2
+[15:50:13] [INFO] Novo cliente conectado: 6
+[15:50:13] [INFO] Cliente identificado: Adora (fd=6)
+[15:50:27] [INFO] Mensagem recebida de Adora (cliente 6): Oi, ja o meu nome eh Adora
+[15:50:27] [INFO] Broadcast enviado (remetente=6, alvos=1)
+[15:50:45] [INFO] Cliente removido (fd=6), total=1
+[15:50:45] [INFO] Cliente 6 desconectado.
+[15:50:46] [INFO] Cliente removido (fd=5), total=0
+[15:50:46] [INFO] Cliente 5 desconectado.

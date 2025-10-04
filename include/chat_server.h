@@ -21,6 +21,9 @@ typedef struct {
     int history_start;
     int history_count;
 
+    /* client names parallel to clients[] (nullable) */
+    char **client_names;
+
     pthread_t broadcaster_tid;
     int running;
 } ChatServer;
@@ -31,5 +34,7 @@ void chat_server_remove_client(ChatServer *s, int client_fd);
 int chat_server_enqueue_message(ChatServer *s, const char *msg, int sender_fd);
 void chat_server_shutdown(ChatServer *s);
 int chat_server_send_history(ChatServer *s, int client_fd, int n);
+int chat_server_set_name(ChatServer *s, int client_fd, const char *name);
+const char *chat_server_get_name(ChatServer *s, int client_fd);
 
 #endif // CHAT_SERVER_H

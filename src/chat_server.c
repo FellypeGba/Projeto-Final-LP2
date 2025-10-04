@@ -71,6 +71,16 @@ int chat_server_init(ChatServer *s, int max_clients, int history_size) {
     s->history_start = 0;
     s->history_count = 0;
 
+    s->client_names = calloc(max_clients, sizeof(char*));
+    if (!s->client_names) {
+        free(s->history);
+        mq_destroy(&s->mq);
+        sem_destroy(&s->slots);
+        pthread_mutex_destroy(&s->clients_mtx);
+        free(s->clients);
+        return -1;
+    }
+
     s->running = 1;
     if (pthread_create(&s->broadcaster_tid, NULL, broadcaster_func, s) != 0) {
         /* cleanup on failure */
@@ -96,6 +106,7 @@ int chat_server_add_client(ChatServer *s, int client_fd) {
         return -1;
     }
     s->clients[s->num_clients++] = client_fd;
+    s->client_names[s->num_clients-1] = NULL;
     pthread_mutex_unlock(&s->clients_mtx); //libera lock apos modificar clients
     tslog_write(LOG_INFO, "Cliente adicionado (fd=%d), total=%d", client_fd, s->num_clients);
     return 0;
@@ -107,6 +118,10 @@ void chat_server_remove_client(ChatServer *s, int client_fd) {
     for (int i = 0; i < s->num_clients; i++) {
         if (s->clients[i] == client_fd) {
             s->clients[i] = s->clients[s->num_clients-1];
+            /* move name too */
+            free(s->client_names[i]);
+            s->client_names[i] = s->client_names[s->num_clients-1];
+            s->client_names[s->num_clients-1] = NULL;
             s->num_clients--;
             break;
         }
@@ -114,6 +129,36 @@ void chat_server_remove_client(ChatServer *s, int client_fd) {
     pthread_mutex_unlock(&s->clients_mtx); //liber lock apos remover um cliente
     sem_post(&s->slots);
     tslog_write(LOG_INFO, "Cliente removido (fd=%d), total=%d", client_fd, s->num_clients);
+}
+
+/* define o nome de um cliente já registrado (faz strdup) */
+int chat_server_set_name(ChatServer *s, int client_fd, const char *name) {
+    if (!s || !name) return -1;
+    pthread_mutex_lock(&s->clients_mtx);
+    for (int i = 0; i < s->num_clients; ++i) {
+        if (s->clients[i] == client_fd) {
+            char *dup = strdup(name);
+            if (!dup) { pthread_mutex_unlock(&s->clients_mtx); return -1; }
+            free(s->client_names[i]);
+            s->client_names[i] = dup;
+            pthread_mutex_unlock(&s->clients_mtx);
+            return 0;
+        }
+    }
+    pthread_mutex_unlock(&s->clients_mtx);
+    return -1;
+}
+
+/* get name (caller must not free) */
+const char *chat_server_get_name(ChatServer *s, int client_fd) {
+    if (!s) return NULL;
+    const char *res = NULL;
+    pthread_mutex_lock(&s->clients_mtx);
+    for (int i = 0; i < s->num_clients; ++i) {
+        if (s->clients[i] == client_fd) { res = s->client_names[i]; break; }
+    }
+    pthread_mutex_unlock(&s->clients_mtx);
+    return res;
 }
 
 int chat_server_enqueue_message(ChatServer *s, const char *msg, int sender_fd) {
@@ -151,6 +196,10 @@ void chat_server_shutdown(ChatServer *s) {
 
     mq_destroy(&s->mq);
     free(s->clients);
+    for (int i = 0; i < s->max_clients; ++i) {
+        free(s->client_names[i]);
+    }
+    free(s->client_names);
     for (int i = 0; i < s->history_count; i++) {
         int idx = (s->history_start + i) % s->history_size;
         free(s->history[idx]);
