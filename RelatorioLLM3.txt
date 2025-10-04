@@ -1,0 +1,71 @@
+Relatório de Interação com LLM para produção da Terceira Entrega do Projeto
+
+LLM Utilizada: Copilot Pro para Estudantes (integrado ao VSCode)
+
+    Comentário 1:
+Neste primeiro momento, eu dei todo o contexto do código e do Projeto ao
+Copilot, indicando que até a segunda entrega já tinha sido feito. Depois,
+ele me sugeriu várias mudanças, principalmente indicando que o código
+podia usar estruturas de mais alto nível, além de tornar mais claro e 
+explicíto o uso das entruturas de sincronização, como mutex, semáforos,
+variavéis condicionais, etc.
+Então, a partir disso, foi uma sequência de passos, onde tentamos
+implementar as mudanças indicadas em cada arquivo e também tentando
+reformular o código para lidar com estruturas de mais alto nível.
+Outra coisa importante, é que nesta etapa do projeto, começou-se a
+implementar mudanças para tratar melhor os erros do programa.
+
+    Comentário 1.1:
+Com essas mudanças, a nova estrutura do código indicada pela LLM era:
+    threadsafe_queue (monitor com pthread_mutex + pthread_cond) —
+fila de mensagens.
+    chat_server (monitor) — lista de clientes protegida, semáforo para
+vagas (slots), histórico circular protegido, e thread broadcaster que
+consome a fila e envia broadcasts.
+    Refatorar server.c:
+        client_thread enfileira mensagens em threadsafe_queue em vez de
+fazer send() diretamente.
+        broadcaster envia mensagens de forma centralizada (evita race em
+send()).
+        chat_server trata add/remove client, sem_wait/sem_post.
+
+
+    Pedido 2:
+"Pode implementar as mudanças conforme você indicou na estrutura"
+
+    Resposta 2:
+Aqui basicamente ele saiu indicando os passos que estava fazendo,
+começando com a criação dos módulos de threadsafe_queue, ou seja, uma 
+fila segura de threads que correspondem a clientes. Além da estrutura
+chat_server, para controlar o acesso ao log. Essa nova abordagem foi
+implementada usando monitores, por serem uma forma de sincronização de
+mais alto nível.
+
+    Comentário 2:
+Com o aumento de estruturas de alto nível, o código ficou mais "seguro",
+mas também com mais dificuldade de ser entendido. Então pedi uma "pausa",
+nas implementações após essa parte 2, e passei a pedir comentários para
+que eu pudesse ler e entender bem o que o código esta fazende, antes de
+continuar para os próximos passos
+
+    Pedido 3:
+"Na verdade, diante de todo esse contexto, gostaria de ter um momento de
+"checkpoint", onde em vez de seguir os próximos passos de implementação,
+fosse analisado bem o que se tem agora e comentado as linhas mais
+importantes para indicar de fora geral o objetivo das funções"
+
+    Resposta 3:
+Após fazer uma explicação bem detalhada sobre a estrutura do código, ele
+mapeou os requisitos do enunciado com o que estava implementado até agora:
+Mapeamento para requisitos do enunciado
+    Threads: Sim — pthread usados para clientes e broadcaster.
+    Exclusão mútua: Sim — clients_mtx e fila mutex.
+    Semáforos/condvar: Sim — sem_t slots e pthread_cond_t na fila.
+    Monitores: ChatServer e message_queue_t encapsulam sincronização — OK.
+    Sockets: Sim — TCP server/client implementados.
+    Gerenciamento de recursos: muitas liberações corretas;
+ver observação sobre sinal handler e checagens de retorno.
+    Tratamento de erros: bastante logging; faltam tratamento profundo
+em alguns inits.
+    Logging: tslog usado em eventos importantes — presente.
+    Build: make pronto — testado e compilou.

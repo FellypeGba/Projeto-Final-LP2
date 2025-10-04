@@ -1,0 +1,11 @@
+[23:56:16] [INFO] Servidor iniciado na porta 9000
+[23:56:23] [INFO] Novo cliente conectado: 5
+[23:56:29] [INFO] Mensagem recebida do cliente 5: Oi, eu sou Fellype
+[23:56:29] [INFO] Mensagem enviada ao servidor pelo cliente 5
+[23:56:40] [INFO] Mensagem recebida do cliente 5: E ai, como vao vcs?
+[23:56:40] [INFO] Mensagem enviada ao servidor pelo cliente 5
+[23:57:04] [INFO] Novo cliente conectado: 6
+[23:57:13] [INFO] Mensagem recebida do cliente 6: Oi, sou Tereza Cristina
+[23:57:13] [INFO] Mensagem enviada ao servidor pelo cliente 6
+[00:01:24] [INFO] Cliente 6 desconectado.
+[00:01:25] [INFO] Cliente 5 desconectado.
