@@ -18,10 +18,10 @@ void *receive_thread(void *arg) {
     char buffer[256];
     ssize_t len;
     /*
-     * Receiver thread: prints any message sent by the server. It uses a
-     * fixed-size buffer (256 bytes); messages larger than this will be
-     * truncated. For a production implementation consider a length-prefix
-     * protocol or dynamic buffer growth.
+     * Thread de recepção: imprime qualquer mensagem enviada pelo servidor.
+     * Usa um buffer de tamanho fixo (256 bytes); mensagens maiores serão
+     * truncadas. Para produção, considere um protocolo com prefixo de
+     * comprimento ou crescimento dinâmico do buffer.
      */
     while ((len = recv(sock, buffer, sizeof(buffer)-1, 0)) > 0) {
         buffer[len] = '\0';
@@ -82,12 +82,12 @@ int main() {
             tslog_write(LOG_INFO, "Cliente solicitado /quit");
             break;
         }
-        /*
-         * Sending: we use a single send() call. In rare cases send() may
-         * perform a partial write; a robust implementation should loop
-         * until the whole buffer is sent or an error occurs (see
-         * send_all suggestion in the checkpoint notes).
-         */
+    /*
+     * Envio: usamos uma única chamada send(). Em casos raros send()
+     * pode escrever parcialmente; uma implementação robusta deveria
+     * iterar até enviar tudo ou ocorrer um erro (ver sugestão
+     * send_all nas notas do checkpoint).
+     */
         ssize_t s = send(sock, msg, strlen(msg), 0);
         if (s < 0) {
             perror("send");
@@ -96,9 +96,9 @@ int main() {
         }
         tslog_write(LOG_INFO, "Mensagem enviada ao servidor pelo cliente %d", sock);
 
-        /* small pause used in tests to increase chance of seeing broadcast
-         * output before the client exits; this is optional and can be
-         * removed once tests are stable. */
+        /* pequena pausa usada em testes para aumentar a chance de ver o
+         * broadcast antes do cliente encerrar; é opcional e pode ser
+         * removida quando os testes estiverem estáveis. */
         sleep(1);
     }
 

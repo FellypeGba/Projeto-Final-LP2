@@ -18,9 +18,9 @@ int mq_push(message_queue_t *q, const char *msg, int sender) {
     if (!q || !msg) return -1;
     mq_item_t *it = malloc(sizeof(mq_item_t));
     if (!it) return -1;
-    /* duplicate the message: the queue owns this copy and the caller may
-     * free its own buffer independently. mq_pop will transfer ownership to
-     * the consumer (who must free it). */
+    /* duplicar a mensagem: a fila passa a possuir esta cópia e o chamador
+     * pode liberar seu próprio buffer independentemente. mq_pop transferirá
+     * a posse para o consumidor (que deve liberar). */
     it->msg = strdup(msg);
     it->sender = sender;
     it->next = NULL;
@@ -54,7 +54,7 @@ int mq_pop(message_queue_t *q, char **out_msg, int *out_sender) {
     q->head = it->next;
     if (!q->head) q->tail = NULL;
     pthread_mutex_unlock(&q->mtx);
-    /* transfer ownership of the string to the caller */
+    /* transferir a posse da string para o chamador */
     *out_msg = it->msg;
     *out_sender = it->sender;
     free(it);

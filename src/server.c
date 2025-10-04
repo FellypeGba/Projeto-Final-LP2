@@ -25,11 +25,13 @@ static void sigint_handler(int signo) {
         server_fd_global = -1;
     }
     /*
-     * SIGINT handler: mark the server to stop and close the listening socket
-     * Note: calling complex functions (like chat_server_shutdown) directly
-     * from a signal handler can be unsafe because many functions are not
-     * async-signal-safe. Here we set the flag and close the listening fd so
-     * that accept() unblocks; the main thread performs the full shutdown.
+     * Handler de SIGINT: marcar o servidor para parar e fechar o socket
+     * de escuta. Atenção: chamar funções complexas (por exemplo
+     * chat_server_shutdown) diretamente dentro de um signal handler pode
+     * ser inseguro, pois muitas funções não são async-signal-safe. Aqui
+     * apenas setamos a flag e fechamos o descritor de escuta para que
+     * accept() seja desbloqueado; o encerramento completo é feito na
+     * thread principal.
      */
     tslog_write(LOG_INFO, "SIGINT recebido: encerrando servidor");
     /* chat_server_shutdown is called later from main after accept returns */
@@ -43,10 +45,10 @@ void *client_thread(void *arg) {
     ssize_t len;
 
     /*
-     * Per-client thread: reads from the client's socket and enqueues
-     * received messages into the ChatServer's message queue. This thread
-     * does not perform broadcasting itself to avoid races on send(); the
-     * broadcaster thread handles forwarding to all other clients.
+     * Thread por cliente: lê do socket do cliente e enfileira as
+     * mensagens recebidas na fila do ChatServer. Esta thread não envia
+     * broadcasts diretamente para evitar races em send(); a thread
+     * broadcaster faz o reencaminhamento para os demais clientes.
      */
     while ((len = recv(sock, buffer, sizeof(buffer)-1, 0)) > 0) {
         buffer[len] = '\0';
@@ -97,13 +99,13 @@ int main() {
     }
 
     /*
-     * Main server flow:
-     * 1. initialize logging and listening socket
-     * 2. initialize ChatServer (clients list, queue, broadcaster thread)
-     * 3. accept loop: accept() new connections, register client with
-     *    chat_server_add_client and spawn a per-client thread that reads
-     *    from the socket and enqueues messages
-     * 4. when signaled, exit the loop and perform chat_server_shutdown
+     * Fluxo principal do servidor:
+     * 1. inicializar o logger e o socket de escuta
+     * 2. inicializar o ChatServer (lista de clientes, fila, broadcaster)
+     * 3. loop de accept: aceitar novas conexões, registrar o cliente com
+     *    chat_server_add_client e criar uma thread por cliente que lê do
+     *    socket e enfileira mensagens
+     * 4. quando sinalizado, sair do loop e executar chat_server_shutdown
      */
     tslog_write(LOG_INFO, "Servidor iniciado na porta %d", PORT);
 

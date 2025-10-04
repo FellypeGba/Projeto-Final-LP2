@@ -11,11 +11,12 @@ static void *broadcaster_func(void *arg) {
     char *msg = NULL;
     int sender;
     /*
-     * Broadcaster thread: consumes messages from the message queue and
-     * forwards them to all connected clients except the sender. It holds
-     * the clients mutex while iterating the list to ensure consistency.
-     * The message ownership is transferred by mq_pop (it returns a
-     * heap-allocated string which the broadcaster must free).
+     * Thread broadcaster: consome mensagens da fila de mensagens e as
+     * encaminha para todos os clientes conectados, exceto o remetente.
+     * A thread mantém o mutex de clients enquanto itera a lista para
+     * garantir consistência. A posse da mensagem é transferida por
+     * mq_pop (que retorna uma string alocada no heap que o broadcaster
+     * deve liberar).
      */
     while (s->running) {
         if (mq_pop(&s->mq, &msg, &sender) != 0) {
@@ -45,8 +46,9 @@ int chat_server_init(ChatServer *s, int max_clients, int history_size) {
     if (!s->clients) return -1;
     s->num_clients = 0;
     s->max_clients = max_clients;
-    /* initialize synchronization primitives -- check returns in a
-     * hardened implementation (omitted here for brevity). */
+    /* inicializa as primitivas de sincronização -- em uma versão mais
+     * robusta deveríamos checar os retornos de cada inicialização e
+     * realizar cleanup em caso de erro (omitido aqui por brevidade). */
     pthread_mutex_init(&s->clients_mtx, NULL);
     sem_init(&s->slots, 0, max_clients);
     mq_init(&s->mq);
