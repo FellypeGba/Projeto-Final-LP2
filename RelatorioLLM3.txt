@@ -111,3 +111,13 @@ lida com writes parciais e EINTR.
 conta quantos alvos foram atingidos; loga: "Broadcast enviado (remetente=X,
 alvos=Y)".
         client.c usa send_all para enviar mensagens do cliente"
+
+    Comentário 5:
+Após essa etapa, foi adicionado o net.c e net.h, ele têm o objetivo de tornar
+o send_all mais seguro através do uso utilitários de entrada e saida para lidar
+melhor com um buffer mais dinâmico. Com isso, o projeto já apresentava a
+arquitetura e estrutura de código conforme era necessário para os requisitos.
+Então, essa última parte foi mais sobre pedidos para que Copilot checasse algum
+erro e por parte de implementação. Ficou mais sendo pedidos modificações para
+tornar o código mais "amigável", colocando mais mensagens para o servidor e
+nomes próprios para os clientes.
