@@ -137,3 +137,9 @@ Dessa forma, os requisitos do projeto foram satisfeitos, com este Relatório sob
 o uso da LLM, diagrama correspondete, uso de primitivas de sincronização pthreads
 (mutexes, semáforos, variavéis condicionais e monitores), além das conexões de rede
 usando sockets e o protocolo TCP.
+
+    Observações Finais:
+Diagrama: Foi usando com a ferramenta do site: https://www.planttext.com/
+Mapeamento: Com ajuda do Copilot, foi possível indicar de forma rápida em que parte
+do código estava implementado os requisitos do projeto, conforme está sendo indicando
+no arquivo "MapeamentoCodigoRequisitos.md"
