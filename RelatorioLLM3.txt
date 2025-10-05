@@ -121,3 +121,19 @@ Então, essa última parte foi mais sobre pedidos para que Copilot checasse algu
 erro e por parte de implementação. Ficou mais sendo pedidos modificações para
 tornar o código mais "amigável", colocando mais mensagens para o servidor e
 nomes próprios para os clientes.
+
+    Comentário 6 (Conclusão):
+Após esses últimos detalhes, o código ficou completo, conforme a arquitetura 
+indicada no arquivo "DiagramaFinal" presente neste repositório. A ideia é usar
+o client.c como cadastro de uma entidade cliente, que envia mensagens por sockets
+para o servidor (server.c), que gerencia a comunição de forma geral através dos
+protocolos de rede, teste e tratamento erros de conexão no possível. Como Seção
+Crítica, temos a área do log de servidor, então, para evitar condições de corrida,
+a entidade chat_server funciona como monitor, usando mutexes e semáforos para 
+organizar de forma eficiente o acesso ao log_server, criando clientes em uma fila.
+Enquanto isso, o threadsafe_queue usa mutexes e até variavéis condicionais para
+receber as strings de mensagens do chat_server e decidir qual mensagem será escrita.
+Dessa forma, os requisitos do projeto foram satisfeitos, com este Relatório sobre
+o uso da LLM, diagrama correspondete, uso de primitivas de sincronização pthreads
+(mutexes, semáforos, variavéis condicionais e monitores), além das conexões de rede
+usando sockets e o protocolo TCP.

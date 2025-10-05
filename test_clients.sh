@@ -13,7 +13,7 @@ echo "Iniciando $NUM_CLIENTS clientes com base de nome '$BASE_NAME'..."
 for i in $(seq 1 $NUM_CLIENTS); do
     NAME="${BASE_NAME}${i}"
     # Inicia cada cliente em background, envia uma mensagem e fecha
-    echo "Oi do $NAME" | ./client "$NAME" &
+    echo "Oi de $NAME" | ./client "$NAME" &
     sleep 0.2
 done
 

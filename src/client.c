@@ -63,7 +63,8 @@ int main(int argc, char **argv) {
     if (argc >= 2) {
         const char *name = argv[1];
         char name_msg[256];
-        snprintf(name_msg, sizeof(name_msg), "NAME:%s", name);
+        /* enviar NAME com newline para delimitar claramente o campo */
+        snprintf(name_msg, sizeof(name_msg), "NAME:%s\n", name);
         if (send_all(sock, name_msg, strlen(name_msg)) < 0) {
             perror("send (name)");
             tslog_write(LOG_WARN, "Falha ao enviar nome do cliente");

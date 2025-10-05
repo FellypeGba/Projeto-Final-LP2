@@ -54,9 +54,30 @@ void *client_thread(void *arg) {
         buffer[len] = '\0';
         /* Se for uma mensagem de nome (prefixo NAME:), registre o nome e não broadcast */
         if (strncmp(buffer, "NAME:", 5) == 0) {
-            const char *name = buffer + 5;
-            chat_server_set_name(&chat, sock, name);
-            tslog_write(LOG_INFO, "Cliente identificado: %s (fd=%d)", name, sock);
+            /* procurar por newline que delimita o nome */
+            char *newline = strchr(buffer + 5, '\n');
+            if (newline) {
+                *newline = '\0';
+                const char *name = buffer + 5;
+                chat_server_set_name(&chat, sock, name);
+                tslog_write(LOG_INFO, "Cliente identificado: %s (fd=%d)", name, sock);
+                /* se existir conteúdo após o newline, tratar como mensagem normal */
+                char *leftover = newline + 1;
+                if (*leftover) {
+                    const char *cname2 = chat_server_get_name(&chat, sock);
+                    if (cname2) {
+                        tslog_write(LOG_INFO, "Mensagem recebida de %s (cliente %d): %s", cname2, sock, leftover);
+                    } else {
+                        tslog_write(LOG_INFO, "Mensagem recebida do cliente %d: %s", sock, leftover);
+                    }
+                    chat_server_enqueue_message(&chat, leftover, sock);
+                }
+            } else {
+                /* sem newline — trate todo o buffer como nome (compatibilidade) */
+                const char *name = buffer + 5;
+                chat_server_set_name(&chat, sock, name);
+                tslog_write(LOG_INFO, "Cliente identificado: %s (fd=%d)", name, sock);
+            }
             continue;
         }
         /* log com nome quando disponível */

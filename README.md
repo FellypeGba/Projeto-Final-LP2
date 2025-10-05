@@ -33,8 +33,14 @@ Então, é só executar o código do cliente neste outro terminal:
 ``` bash
 ./client
 ```
+Se quiser colocar o seu cliente com um nome curto, basta colocar o nome na chamada de execução:
+``` bash
+./client Pedro
+```
+Isso identificará o cliente como Pedro nos logs.
 O log do servidor estará sendo escrito em **"server_log.txt"**  
 Enquanto isso, os logs do clientes sempre são criados um para cada client rodado, no formato: **"client_log(PID).txt"**
+
 ### Teste Simulando Múltiplos clientes
 Para simular múltiplos clientes de forma prática, execute o servidor como dito anteriormente.  
 Porém, para a parte de clientes, basta executar estes comandos em um novo terminal:  
@@ -47,3 +53,9 @@ Executanto o script:
 ./test_clients.sh
 ```
 Nesta abordagem, os logs dos clientes entrarão na pasta **client_logs**
+E se quiser adicionar um nome base e o número de clientes a serem testados, execute da forma:  
+"comando de execução (número de clientes) (nome base)", exemplo:
+``` bash
+./test_clients.sh 3 Medico
+```
+Isso testará 3 clientes com "Medico" como nome base.
